@@ -35,6 +35,7 @@ import android.widget.Button;
 public class SpeechActivationServicePlay extends Activity
 {
     private static final String TAG = "SpeechActivationServicePlay";
+    static String activationType;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -68,6 +69,10 @@ public class SpeechActivationServicePlay extends Activity
         
     }
     
+    public static String getActivationType(){
+    	return activationType;
+    }
+    
     private Button makeStartButton(int button, final int name)
     {
         Button start = (Button)findViewById(button);
@@ -77,6 +82,7 @@ public class SpeechActivationServicePlay extends Activity
             public void onClick(View v)
             {
                 String activationTypeName = SpeechActivationServicePlay.this.getString(name);
+                activationType = activationTypeName;
                 Intent i = SpeechActivationService.makeStartServiceIntent(SpeechActivationServicePlay.this,
                         activationTypeName);
                 SpeechActivationServicePlay.this.startService(i);

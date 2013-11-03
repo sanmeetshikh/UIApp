@@ -17,6 +17,8 @@ package root.gast.speech.activation;
 
 import root.gast.speech.movement.MovementDetectionListener;
 import root.gast.speech.movement.MovementDetector;
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.content.Context;
 
 /**
@@ -29,12 +31,13 @@ public class MovementActivator implements SpeechActivator,
     private MovementDetector detector;
 
     private SpeechActivationListener resultListener;
-
+    Context context;
     public MovementActivator(Context context,
             SpeechActivationListener resultListener)
     {
         detector = new MovementDetector(context);
         this.resultListener = resultListener;
+        this.context=context;
     }
 
     @Override

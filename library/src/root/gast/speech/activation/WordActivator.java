@@ -28,6 +28,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 
+
 /**
  * Uses direct speech recognition to activate when the user speaks
  * one of the target words

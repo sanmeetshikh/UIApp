@@ -197,7 +197,7 @@
     <string name="speech_activation_btn_prefix">Start </string>
     <string name="speech_activation_btn_listening">Listening for </string>
 
-    <string name="speech_launcher_prompt">Say a test phrase.</string>
+    <string name="speech_launcher_prompt">What would you like to do?</string>
     
     <string name="btn_speech_start_service">Start</string>
     <string name="btn_speech_stop_service">Stop</string>

@@ -20,11 +20,17 @@ import java.util.List;
 import root.gast.playground.R;
 import root.gast.speech.SpeechRecognizingAndSpeakingActivity;
 import root.gast.speech.tts.TextToSpeechUtils;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
+import root.gast.speech.activation.SpeechActivationService;
+import root.gast.playground.speech.SpeechActivationServicePlay;
 
 /**
  * Starts a speech recognition dialog and then sends the results to
@@ -43,12 +49,15 @@ public class SpeechRecognitionLauncher extends
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+    	Window window = this.getWindow();
+    	window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    	window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         super.onCreate(savedInstanceState);
     }
-
     @Override
     public void onSuccessfulInit(TextToSpeech tts)
     {
+    	
         super.onSuccessfulInit(tts);
         prompt();
     }
@@ -79,6 +88,8 @@ public class SpeechRecognitionLauncher extends
                     getString(R.string.speech_launcher_prompt));
             recognize(recognizerIntent);
         }
+        
+        
     }
 
     @Override
@@ -97,7 +108,10 @@ public class SpeechRecognitionLauncher extends
                 startActivity(showResults);
             }
         }
-
+        this.moveTaskToBack(true);
+        String activationType = SpeechActivationServicePlay.getActivationType();
+        Intent i = SpeechActivationService.makeStartServiceIntent(this, activationType);
+        this.startService(i);
         finish();
     }
 

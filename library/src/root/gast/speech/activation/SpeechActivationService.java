@@ -37,6 +37,7 @@ public class SpeechActivationService extends Service implements
         SpeechActivationListener
 {
     private static final String TAG = "SpeechActivationService";
+    
     public static final String NOTIFICATION_ICON_RESOURCE_INTENT_KEY =
         "NOTIFICATION_ICON_RESOURCE_INTENT_KEY";
     public static final String ACTIVATION_TYPE_INTENT_KEY =
@@ -57,17 +58,18 @@ public class SpeechActivationService extends Service implements
     private boolean isStarted;
 
     private SpeechActivator activator;
-
+    
     @Override
     public void onCreate()
     {
         super.onCreate();
         isStarted = false;
     }
-
+    
     public static Intent makeStartServiceIntent(Context context,
             String activationType)
     {
+    	//activationString = activationType;
         Intent i = new Intent(context, SpeechActivationService.class);
         i.putExtra(ACTIVATION_TYPE_INTENT_KEY, activationType);
         return i;
@@ -79,7 +81,7 @@ public class SpeechActivationService extends Service implements
         i.putExtra(ACTIVATION_STOP_INTENT_KEY, true);
         return i;
     }
-
+    
     /**
      * stop or start an activator based on the activator type and if an
      * activator is currently running
