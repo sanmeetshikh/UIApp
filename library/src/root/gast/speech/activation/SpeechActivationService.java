@@ -25,6 +25,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import bin.classes.root.gast.playground.speech.*;
+
 
 /**
  * Persistently run a speech activator in the background.
@@ -215,9 +217,13 @@ public class SpeechActivationService extends Service implements
                         + " " + name;
         String title = getString(R.string.speech_activation_notification_title);
 
-        PendingIntent pi =
-                PendingIntent.getService(this, 0, makeServiceStopIntent(this),
-                        0);
+       // PendingIntent pi =
+       //         PendingIntent.getService(this, 0, makeServiceStopIntent(this),
+       //                 0);
+        
+        //PI to open the app when notification is clicked
+        Intent notificationIntent = new Intent(this, SpeechActivationServicePlay.class);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         int icon = intent.getIntExtra(NOTIFICATION_ICON_RESOURCE_INTENT_KEY, R.drawable.icon);
 
