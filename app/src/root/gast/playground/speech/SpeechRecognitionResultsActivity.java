@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.Locale;
 
 import root.gast.playground.R;
+import root.gast.speech.activation.SpeechActivationService;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -80,10 +83,23 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	{
 	                		destination += s + " ";
 	                	}
-	                	finish();
+	                	//finish();
 	                	String uri = String.format(Locale.ENGLISH, "geo:0,0?q=%s", destination);
 	                	Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-	                	this.startActivity(intent);
+	                	startActivityForResult(intent, 0);
+	                	break;
+	                }
+	                if(result.contains("camera"))
+	                {
+	                	//finish();
+	                	try{
+	                	Intent cameraIntent = getPackageManager().getLaunchIntentForPackage("com.saycheese");
+	                	startActivityForResult(cameraIntent, 0);
+	                	}
+	                	catch(Exception e)
+	                	{
+	                		//catch exception
+	                	}
 	                	break;
 	                }
                 }
@@ -119,5 +135,30 @@ public class SpeechRecognitionResultsActivity extends Activity
                 a.show();
             }
         }
+    }
+    
+    public boolean checkAppRunning(String app)
+    {
+    	ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        List<RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
+        for(int i = 0; i < procInfos.size(); i++){
+            if(procInfos.get(i).processName.equals(app)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void
+    onWindowFocusChanged(boolean hasFocus)
+    {
+    		super.onWindowFocusChanged(hasFocus);
+    		if(hasFocus)
+    		{
+	    		String activationType = SpeechActivationServicePlay.getActivationType();
+	        	Intent i = SpeechActivationService.makeStartServiceIntent(this, activationType);
+	        	this.startService(i);
+	        	finish();
+    		}
     }
 }
