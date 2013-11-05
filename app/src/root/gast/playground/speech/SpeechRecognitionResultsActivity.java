@@ -15,17 +15,22 @@
  */
 package root.gast.playground.speech;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
 import root.gast.playground.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+
 
 /**
  * For displaying the results of the Speech pending intent
@@ -43,55 +48,46 @@ public class SpeechRecognitionResultsActivity extends Activity
     public static String WHAT_YOU_ARE_TRYING_TO_SAY_INTENT_INPUT =
             "WHAT_YOU_ARE_TRYING_TO_SAY_INPUT";
 
-    private ListView log;
-
-    private TextView resultsSummary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.speechrecognition_result);
         Log.d(TAG, "SpeechRecognition Pending intent received");
-        hookButtons();
         init();
-    }
-
-    private void hookButtons()
-    {
-        log = (ListView) findViewById(R.id.lv_resultlog);
-        resultsSummary = (TextView) findViewById(R.id.tv_speechResultsSummary);
     }
 
     private void init()
     {
         if (getIntent() != null)
         {
-            if (getIntent().hasExtra(WHAT_YOU_ARE_TRYING_TO_SAY_INTENT_INPUT))
-            {
-                String whatSayFromIntent =
-                        getIntent().getStringExtra(
-                                WHAT_YOU_ARE_TRYING_TO_SAY_INTENT_INPUT);
-                resultsSummary.setText(whatSayFromIntent);
-            }
-
-            String whatSayFromIntent =
-                    getIntent().getStringExtra(
-                            WHAT_YOU_ARE_TRYING_TO_SAY_INTENT_INPUT);
-            resultsSummary.setText(whatSayFromIntent);
 
             if (getIntent().hasExtra(RecognizerIntent.EXTRA_RESULTS))
             {
                 List<String> results =
                         getIntent().getStringArrayListExtra(
                                 RecognizerIntent.EXTRA_RESULTS);
-                
-                ArrayAdapter<String> adapter =
-                        new ArrayAdapter<String>(this,
-                                R.layout.speechresultactivity_listitem,
-                                R.id.tv_speech_activity_result, results);
-                log.setAdapter(adapter);
-              
+                for(String result:results)
+                {
+	                if(result.contains("navigate"))
+	                {
+	                	String[] resultArray=result.split(" ");
+	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
+	                	int posOfnavigate = resultArrayList.indexOf("navigate");
+	                	List<String> destinationList = resultArrayList.subList(posOfnavigate+2, resultArrayList.size());
+	                	String destination="";
+	                	for (String s : destinationList)
+	                	{
+	                		destination += s + " ";
+	                	}
+	                	finish();
+	                	String uri = String.format(Locale.ENGLISH, "geo:0,0?q=%s", destination);
+	                	Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+	                	this.startActivity(intent);
+	                	break;
+	                }
+                }
+
             }
             else
             {

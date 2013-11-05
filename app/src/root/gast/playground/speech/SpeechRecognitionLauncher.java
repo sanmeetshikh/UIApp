@@ -108,7 +108,7 @@ public class SpeechRecognitionLauncher extends
                 startActivity(showResults);
             }
         }
-        this.moveTaskToBack(true);
+        //this.moveTaskToBack(true);
         String activationType = SpeechActivationServicePlay.getActivationType();
         Intent i = SpeechActivationService.makeStartServiceIntent(this, activationType);
         this.startService(i);
