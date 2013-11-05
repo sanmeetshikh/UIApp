@@ -25,7 +25,7 @@
 	<application android:icon="@drawable/icon" 
 	    android:label="@string/app_name" 
 	    android:logo="@drawable/emptyone">
-        <activity android:name=".GastAppActivity"
+        <activity android:name=".speech.SpeechActivationServicePlay"
                   android:label="@string/activity_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -59,8 +59,6 @@
         <activity android:name=".speech.food.FoodDialogPlay" android:label="@string/launchFoodDialog"/>
 
         <activity android:name=".speech.food.FoodBrowser" android:label="@string/speechFoodBrowserName"/>
-        
-        <activity android:name=".speech.SpeechActivationServicePlay" android:label="@string/launchSpeechActivationService"/>
         
         <activity android:name=".speech.SpeechRecognitionLauncher" android:label="@string/eyesfree_speechlabel"/>
         

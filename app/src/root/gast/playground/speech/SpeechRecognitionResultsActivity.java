@@ -86,11 +86,13 @@ public class SpeechRecognitionResultsActivity extends Activity
                 List<String> results =
                         getIntent().getStringArrayListExtra(
                                 RecognizerIntent.EXTRA_RESULTS);
+                
                 ArrayAdapter<String> adapter =
                         new ArrayAdapter<String>(this,
                                 R.layout.speechresultactivity_listitem,
                                 R.id.tv_speech_activity_result, results);
                 log.setAdapter(adapter);
+              
             }
             else
             {
