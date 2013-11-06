@@ -20,17 +20,12 @@ import java.util.List;
 import root.gast.playground.R;
 import root.gast.speech.SpeechRecognizingAndSpeakingActivity;
 import root.gast.speech.tts.TextToSpeechUtils;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
-import root.gast.speech.activation.SpeechActivationService;
-import root.gast.playground.speech.SpeechActivationServicePlay;
+
 
 /**
  * Starts a speech recognition dialog and then sends the results to
@@ -39,7 +34,7 @@ import root.gast.playground.speech.SpeechActivationServicePlay;
  * @author Greg Milette &#60;<a
  *         href="mailto:gregorym@gmail.com">gregorym@gmail.com</a>&#62;
  */
-public class SpeechRecognitionLauncher extends
+public class TakeUserResponse extends
         SpeechRecognizingAndSpeakingActivity
 {
     private static final String TAG = "SpeechRecognitionLauncher";
@@ -49,9 +44,6 @@ public class SpeechRecognitionLauncher extends
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-    	Window window = this.getWindow();
-    	window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-    	window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         super.onCreate(savedInstanceState);
     }
     @Override
@@ -59,7 +51,17 @@ public class SpeechRecognitionLauncher extends
     {
     	
         super.onSuccessfulInit(tts);
-        prompt(getString(R.string.speech_launcher_prompt));
+        Intent intent = getIntent();
+        if(intent.getStringExtra("ActivationType").equals("CALL"))
+        {
+	        String name = intent.getStringExtra("NAME");
+	        String number = intent.getStringExtra("NUMBER");
+	        prompt("Would you like to call "+name+" on "+number);
+        }
+        if(intent.getStringExtra("ActivationType").equals("NOTHING"))
+        {
+	        prompt("I am sorry this is not a valid command");
+        }
     }
 
     public void prompt(String promptString)
@@ -78,17 +80,22 @@ public class SpeechRecognitionLauncher extends
     @Override
     public void onDone(String utteranceId)
     {
-        if (utteranceId.equals(ON_DONE_PROMPT_TTS_PARAM))
+    	Intent intent = getIntent();
+        if(intent.getStringExtra("ActivationType").equals("CALL"))
         {
-            Intent recognizerIntent =
-                    new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, 
-                    getString(R.string.speech_launcher_prompt));
-            recognize(recognizerIntent);
+	        if (utteranceId.equals(ON_DONE_PROMPT_TTS_PARAM))
+	        {
+	            Intent recognizerIntent =
+	                    new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+	            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+	                    RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+	            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, 
+	                    getString(R.string.speech_launcher_prompt));
+	            recognize(recognizerIntent);
+	        }
         }
-        
+        else
+        	finish();
         
     }
 
@@ -102,16 +109,36 @@ public class SpeechRecognitionLauncher extends
         {
             if (resultCode == RESULT_OK)
             {
-                Intent showResults = new Intent(data);
-                showResults.setClass(this,
-                        SpeechRecognitionResultsActivity.class);
-                startActivity(showResults);
+            	if (data != null)
+                {
+
+                    if (data.hasExtra(RecognizerIntent.EXTRA_RESULTS))
+                    {
+                        List<String> results =
+                                data.getStringArrayListExtra(
+                                        RecognizerIntent.EXTRA_RESULTS);
+                        for(String result:results)
+                        {
+        	                if(result.toLowerCase().contains("yes")||result.toLowerCase().contains("ya")||result.toLowerCase().contains("yup"))
+        	                {
+        	                	getIntent().putExtra("USER_RESPONSE", "yes");
+        	                	break;
+        	                }
+        	                else if(result.toLowerCase().contains("no") || result.toLowerCase().contains("nopes"))
+        	                {
+        	                	getIntent().putExtra("USER_RESPONSE", "no");
+        	                	break;
+        	                }
+        	                else
+        	                {
+        	                	getIntent().putExtra("USER_RESPONSE", "no");
+    	                		break;
+        	                }
+                        }
+                    }
+                }
             }
         }
-        //this.moveTaskToBack(true);
-       // String activationType = SpeechActivationServicePlay.getActivationType();
-       // Intent i = SpeechActivationService.makeStartServiceIntent(this, activationType);
-       // this.startService(i);
         finish();
     }
 

@@ -27,12 +27,16 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.speech.RecognizerIntent;
 import android.util.Log;
+import root.gast.playground.speech.SpeechRecognitionLauncher;
 
 
 /**
@@ -50,7 +54,9 @@ public class SpeechRecognitionResultsActivity extends Activity
      */
     public static String WHAT_YOU_ARE_TRYING_TO_SAY_INTENT_INPUT =
             "WHAT_YOU_ARE_TRYING_TO_SAY_INPUT";
-
+    public static int CALL_REQUEST =1;
+    public static int NOTHING_REQUEST = 2;
+    public static String number="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -59,6 +65,7 @@ public class SpeechRecognitionResultsActivity extends Activity
         Log.d(TAG, "SpeechRecognition Pending intent received");
         init();
     }
+    
 
     private void init()
     {
@@ -72,7 +79,7 @@ public class SpeechRecognitionResultsActivity extends Activity
                                 RecognizerIntent.EXTRA_RESULTS);
                 for(String result:results)
                 {
-	                if(result.contains("navigate"))
+	                if(result.toLowerCase().contains("navigate"))
 	                {
 	                	String[] resultArray=result.split(" ");
 	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
@@ -89,7 +96,7 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	startActivityForResult(intent, 0);
 	                	break;
 	                }
-	                if(result.contains("camera"))
+	                else if(result.toLowerCase().contains("camera"))
 	                {
 	                	//finish();
 	                	try{
@@ -100,6 +107,52 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	{
 	                		//catch exception
 	                	}
+	                	break;
+	                }
+	                else if(result.toLowerCase().contains("search"))
+	                {
+	                	String[] resultArray=result.split(" ");
+	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
+	                	int posOfFor = resultArrayList.indexOf("for");
+	                	List<String> searchList = resultArrayList.subList(posOfFor+1, resultArrayList.size());
+	                	String searchString="";
+	                	for (String s : searchList)
+	                	{
+	                		searchString += s + " ";
+	                	}
+	                	String uri = String.format(Locale.ENGLISH, "http://www.google.com/#q=%s", searchString);
+	                	
+	                	Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+	                	startActivityForResult(intent, 3);
+	                	break;
+	                }
+	                else if(result.toLowerCase().contains("call"))
+	                {
+	                	String[] resultArray=result.split(" ");
+	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
+	                	int posOfCall = resultArrayList.indexOf("call");
+	                	List<String> nameList = resultArrayList.subList(posOfCall+1, resultArrayList.size());
+	                	String name="";
+	                	for (String s : nameList)
+	                	{
+	                		name += s + " ";
+	                	}
+	                	String number = getPhoneNumber(name, this);
+	                	this.number = number;
+	                	Log.d(TAG, "Name: "+name+" Number: "+number);
+	                	Intent i = new Intent(this, TakeUserResponse.class);
+	                	i.putExtra("NAME", name);
+	                	i.putExtra("NUMBER", number);
+	                	i.putExtra("ActivationType", "CALL");
+	                	this.startActivityForResult(i, CALL_REQUEST);
+	                	break;
+	                	
+	                }
+	                else
+	                {
+	                	Intent i = new Intent(this, TakeUserResponse.class);
+	                	i.putExtra("ActivationType", "NOTHING");
+	                	this.startActivityForResult(i, NOTHING_REQUEST);
 	                	break;
 	                }
                 }
@@ -149,6 +202,22 @@ public class SpeechRecognitionResultsActivity extends Activity
         return false;
     }
     
+    public String getPhoneNumber(String name, Context context) {
+    	String ret = null;
+    	name = name.trim();
+    	String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME+" like'%" + name +"%'";
+    	String[] projection = new String[] { ContactsContract.CommonDataKinds.Phone.NUMBER};
+    	Cursor c = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+    	        projection, selection, null, null);
+    	if (c.moveToFirst()) {
+    	    ret = c.getString(0);
+    	}
+    	c.close();
+    	if(ret==null)
+    	    ret = "Unsaved";
+    	return ret;
+    	}
+    
     public void
     onWindowFocusChanged(boolean hasFocus)
     {
@@ -160,5 +229,35 @@ public class SpeechRecognitionResultsActivity extends Activity
 	        	this.startService(i);
 	        	finish();
     		}
+    }
+    
+    @Override
+    protected void
+            onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CALL_REQUEST)
+        {
+            if (resultCode == RESULT_OK)
+            {
+            	if (data != null)
+                {
+            		if(data.hasExtra("USER_RESPONSE"))
+            		{
+            			if(data.getStringExtra("USER_RESPONSE").equals("yes"))
+            			{
+            				if(!number.equals("")&&!number.equals("Unsaved"))
+            				{
+            					String uri = String.format(Locale.ENGLISH, "tel:%s",number);
+            					Intent callIntent = new Intent(Intent.ACTION_CALL);
+            					callIntent.setData(Uri.parse(uri));
+            					startActivity(callIntent);
+            				}
+            			}
+            		}
+                }
+            }
+        }
     }
 }
