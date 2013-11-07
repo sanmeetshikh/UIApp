@@ -62,6 +62,11 @@ public class TakeUserResponse extends
         {
 	        prompt("I am sorry this is not a valid command");
         }
+        if(intent.getStringExtra("ActivationType").equals("PACKAGE"))
+        {
+        	String appName = intent.getStringExtra("APP_NAME");
+	        prompt("Could not find an application called "+appName);
+        }
     }
 
     public void prompt(String promptString)
@@ -117,24 +122,27 @@ public class TakeUserResponse extends
                         List<String> results =
                                 data.getStringArrayListExtra(
                                         RecognizerIntent.EXTRA_RESULTS);
+                        Intent userResponse = new Intent();
                         for(String result:results)
                         {
         	                if(result.toLowerCase().contains("yes")||result.toLowerCase().contains("ya")||result.toLowerCase().contains("yup"))
         	                {
-        	                	getIntent().putExtra("USER_RESPONSE", "yes");
+        	                	userResponse.putExtra("USER_RESPONSE", "yes");
         	                	break;
         	                }
-        	                else if(result.toLowerCase().contains("no") || result.toLowerCase().contains("nopes"))
+        	                else if(result.toLowerCase().contains("no") || result.toLowerCase().contains("nopes") || result.toLowerCase().contains("cancel"))
         	                {
-        	                	getIntent().putExtra("USER_RESPONSE", "no");
+        	                	userResponse.putExtra("USER_RESPONSE", "no");
         	                	break;
         	                }
         	                else
         	                {
-        	                	getIntent().putExtra("USER_RESPONSE", "no");
+        	                	userResponse.putExtra("USER_RESPONSE", "no");
     	                		break;
         	                }
                         }
+                        
+                        setResult(RESULT_OK, userResponse);
                     }
                 }
             }

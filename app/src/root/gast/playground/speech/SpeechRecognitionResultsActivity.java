@@ -30,6 +30,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -56,6 +58,7 @@ public class SpeechRecognitionResultsActivity extends Activity
             "WHAT_YOU_ARE_TRYING_TO_SAY_INPUT";
     public static int CALL_REQUEST =1;
     public static int NOTHING_REQUEST = 2;
+    public static int NO_PACKAGE_FOUND = 5;
     public static String number="";
 
     @Override
@@ -79,7 +82,11 @@ public class SpeechRecognitionResultsActivity extends Activity
                                 RecognizerIntent.EXTRA_RESULTS);
                 for(String result:results)
                 {
-	                if(result.toLowerCase().contains("navigate"))
+                	if(result.toLowerCase().contains("cancel"))
+                	{
+                		break;
+                	}
+                	else if(result.toLowerCase().contains("navigate"))
 	                {
 	                	String[] resultArray=result.split(" ");
 	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
@@ -147,6 +154,41 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	this.startActivityForResult(i, CALL_REQUEST);
 	                	break;
 	                	
+	                }
+	                else if(result.toLowerCase().contains("open"))
+	                {
+	                	
+	                	String[] resultArray=result.split(" ");
+	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
+	                	int posOfOpen = resultArrayList.indexOf("open");
+	                	List<String> nameList = resultArrayList.subList(posOfOpen+1, resultArrayList.size());
+	                	String appName="";
+	                	for (String s : nameList)
+	                	{
+	                		appName += s + " ";
+	                	}
+	                	
+	                	if(appName.equals(""))
+	                	{
+	                		break;
+	                	}
+	                	String packageName = getAppPackage(appName);
+	                	
+	                	if(packageName!=null)
+	                	{
+	                		Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
+		                	startActivityForResult(intent, 0);
+	                		break;
+	                	}
+	                	
+	                	else
+	                	{
+	                		Intent i = new Intent(this, TakeUserResponse.class);
+		                	i.putExtra("APP_NAME", appName);
+		                	i.putExtra("ActivationType", "PACKAGE");
+		                	this.startActivityForResult(i, NO_PACKAGE_FOUND);
+		                	break;
+	                	}
 	                }
 	                else
 	                {
@@ -217,6 +259,28 @@ public class SpeechRecognitionResultsActivity extends Activity
     	    ret = "Unsaved";
     	return ret;
     	}
+    
+    public String getAppPackage(String appName) {
+    	appName = appName.trim();
+    	final PackageManager pm = getPackageManager();
+    	//get a list of installed apps.
+    	List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+    	
+    	for (ApplicationInfo packageInfo : packages) {
+    		Log.d(TAG, "Application Name :"+((String)pm.getApplicationLabel(packageInfo)));
+    		if(((String)pm.getApplicationLabel(packageInfo)).toLowerCase().contains(appName.toLowerCase()))
+    		{
+	    	    Log.d(TAG, "Installed package :" + packageInfo.packageName);
+	    	    if(pm.getLaunchIntentForPackage(packageInfo.packageName)!=null)
+	    	    {
+	    	    	return packageInfo.packageName;
+	    	    }
+	    	    //Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
+    		}
+    	    
+    	}
+    	return null;
+    }
     
     public void
     onWindowFocusChanged(boolean hasFocus)
