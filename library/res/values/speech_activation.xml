@@ -15,7 +15,7 @@
     <string name="speech_activation_nfc">NFC Scan</string>
     <string name="speech_activation_camera">Camera</string>
     <string name="speech_activation_clap">Clap</string>
-    <string name="speech_activation_speak">Speak Hello</string>
+    <string name="speech_activation_speak">Speak Wake Up</string>
 
     <string name="speech_activation_notification_listening">Listening for </string>
     <string name="speech_activation_notification_title">Speech Activation</string>    

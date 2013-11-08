@@ -67,6 +67,11 @@ public class TakeUserResponse extends
         	String appName = intent.getStringExtra("APP_NAME");
 	        prompt("Could not find an application called "+appName);
         }
+        if(intent.getStringExtra("ActivationType").equals("SONG"))
+        {
+        	String songName = intent.getStringExtra("SONG_NAME");
+	        prompt("Could not find the song "+songName);
+        }
     }
 
     public void prompt(String promptString)

@@ -43,7 +43,7 @@ public class SpeechActivatorFactory
         }
         else if (type.equals(context.getResources().getString(R.string.speech_activation_speak)))
         {
-            speechActivator = new WordActivator(context, callback, "hello");
+            speechActivator = new WordActivator(context, callback, "wake up");
         }
         return speechActivator;
     }

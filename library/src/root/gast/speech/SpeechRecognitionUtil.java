@@ -150,7 +150,7 @@ public class SpeechRecognitionUtil
             SpeechRecognizer recognizer)
     {
         //need to have a calling package for it to work
-        if (!recognizerIntent.hasExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE))
+        //if (!recognizerIntent.hasExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE))
         {
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "com.dummy");
         }

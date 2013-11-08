@@ -36,6 +36,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import root.gast.playground.speech.SpeechRecognitionLauncher;
@@ -155,10 +156,42 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	break;
 	                	
 	                }
-	                else if(result.toLowerCase().contains("play music"))
+	                else if(result.toLowerCase().contains("play"))
 	                {
-	                	Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");
-	                	startActivity(intent);
+	                	String[] resultArray=result.split(" ");
+	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
+	                	int posOfPlay = resultArrayList.indexOf("play");
+	                	List<String> nameList = resultArrayList.subList(posOfPlay+1, resultArrayList.size());
+	                	String name="";
+	                	for (String s : nameList)
+	                	{
+	                		name += s + " ";
+	                	}
+	                	if(name.equals(""))
+	                	{
+	                		break;
+	                	}
+	                	String id = "";
+	                	if(name.toLowerCase().equals("music"))
+	                		id = getIdForSong("", this);
+	                	else
+	                		id = getIdForSong(name, this);
+	                	//Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");
+	                	//startActivity(intent);
+	                	if(id!=null)
+	                	{
+	                	Uri uri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);   
+	                	Intent it = new Intent(Intent.ACTION_VIEW, uri);   
+	                	startActivity(it);
+	                	}
+	                	else
+	                	{
+	                		Intent i = new Intent(this, TakeUserResponse.class);
+		                	i.putExtra("SONG_NAME", name);
+		                	i.putExtra("ActivationType", "SONG");
+		                	this.startActivityForResult(i, NO_PACKAGE_FOUND);
+		                	break;
+	                	}
 	                	break;
 	                }
 	                else if(result.toLowerCase().contains("weather"))
@@ -247,18 +280,6 @@ public class SpeechRecognitionResultsActivity extends Activity
         }
     }
     
-    public boolean checkAppRunning(String app)
-    {
-    	ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-        List<RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
-        for(int i = 0; i < procInfos.size(); i++){
-            if(procInfos.get(i).processName.equals(app)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     public String getPhoneNumber(String name, Context context) {
     	String ret = null;
     	name = name.trim();
@@ -274,6 +295,26 @@ public class SpeechRecognitionResultsActivity extends Activity
     	    ret = "Unsaved";
     	return ret;
     	}
+    
+    public String getIdForSong(String name, Context context)
+    {
+    	 String ret = null;
+    	name = name.trim();
+    	String selection = MediaStore.Audio.Media.DISPLAY_NAME +" like'%" + name +"%'";
+        String[] projection = new String[] { MediaStore.Audio.Media._ID};
+
+        Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+    	        projection, selection, null, null);
+        
+        if (c.moveToFirst()) {
+    	    ret = c.getString(0);
+    	}
+    	c.close();
+
+    	return ret;
+    }
+    
+    
     
     public String getAppPackage(String appName) {
     	appName = appName.trim();

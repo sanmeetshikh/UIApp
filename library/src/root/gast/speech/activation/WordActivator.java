@@ -63,6 +63,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     private void recognizeSpeechDirectly()
     {
     	Log.d(TAG, "Recognize speech directly");
+    	
         Intent recognizerIntent =
                 new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -144,6 +145,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
         {
         	Log.d(TAG, "Keep Going");
             // keep going
+        	//
             recognizeSpeechDirectly();
         }
     }
@@ -190,6 +192,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     @Override
     public void onEndOfSpeech()
     {
+    	
     	Log.d(TAG, "on end of speech");
     }
 

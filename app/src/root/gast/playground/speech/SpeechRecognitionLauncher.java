@@ -45,6 +45,8 @@ public class SpeechRecognitionLauncher extends
     private static final String TAG = "SpeechRecognitionLauncher";
 
     private static final String ON_DONE_PROMPT_TTS_PARAM = "ON_DONE_PROMPT";
+    
+    String selectedString="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -59,7 +61,12 @@ public class SpeechRecognitionLauncher extends
     {
     	
         super.onSuccessfulInit(tts);
-        prompt(getString(R.string.speech_launcher_prompt));
+        
+        String[] prompts = {getString(R.string.speech_launcher_prompt), "How can I help you?", "What can I do for you?",
+        					"How can I assist you?", "I am at your service"};
+        int selection = (int)(Math.random()*prompts.length);
+        selectedString = prompts[selection];
+        prompt(prompts[selection]);
     }
 
     public void prompt(String promptString)
@@ -85,7 +92,7 @@ public class SpeechRecognitionLauncher extends
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                     RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, 
-                    getString(R.string.speech_launcher_prompt));
+            		selectedString);
             recognize(recognizerIntent);
         }
         
