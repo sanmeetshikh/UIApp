@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.util.Log;
 
 /**
  * A utility class to perform common speech recognition functions
@@ -48,6 +49,7 @@ public class SpeechRecognitionUtil
      */
     public static boolean isSpeechAvailable(Context context)
     {
+    	Log.d(TAG, "isSpeechAvailable");
         PackageManager pm = context.getPackageManager();
         List<ResolveInfo> activities = pm.queryIntentActivities(
                 new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
@@ -71,6 +73,7 @@ public class SpeechRecognitionUtil
     public static void getLanguageDetails(Context context,
             OnLanguageDetailsListener andThen)
     {
+    	Log.d(TAG, "getLanguagedetails");
         Intent detailsIntent = new Intent(
                 RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
         LanguageDetailsChecker checker = new LanguageDetailsChecker(andThen);
@@ -82,6 +85,7 @@ public class SpeechRecognitionUtil
     
     public static List<String> getHeardFromDirect(Bundle bundle)
     {
+    	Log.d(TAG, "getHeard From Direct");
         List<String> results = new ArrayList<String>();
         if ((bundle != null)
                 && bundle.containsKey(SpeechRecognizer.RESULTS_RECOGNITION))
@@ -94,6 +98,7 @@ public class SpeechRecognitionUtil
 
     public static float[] getConfidenceFromDirect(Bundle bundle)
     {
+    	Log.d(TAG, "getConfidence");
         float [] scores = null;
         if ((bundle != null)
                 && bundle.containsKey(SpeechRecognizer.RESULTS_RECOGNITION))
@@ -106,6 +111,7 @@ public class SpeechRecognitionUtil
 
     public static List<String> getHeardFromDirectPartial(Bundle bundle)
     {
+    	Log.d(TAG, "getheard partial");
         List<String> results = new ArrayList<String>();
         if (bundle.containsKey(UNSUPPORTED_GOOGLE_RESULTS))
         {
@@ -123,6 +129,7 @@ public class SpeechRecognitionUtil
     public static float[] getConfidenceFromDirectPartial(Bundle bundle)
     {
         float[] scores = null;
+        Log.d(TAG, "getconfidence partial");
 
         if (bundle
                 .containsKey(UNSUPPORTED_GOOGLE_RESULTS_CONFIDENCE))
@@ -147,9 +154,9 @@ public class SpeechRecognitionUtil
         {
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "com.dummy");
         }
-        
         recognizer.setRecognitionListener(listener);
         recognizer.startListening(recognizerIntent);
+        Log.d(TAG, "Recognize speech directly");
     }
 
     public static String diagnoseErrorCode(int errorCode)

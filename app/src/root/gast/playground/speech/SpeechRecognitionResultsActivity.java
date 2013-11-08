@@ -155,6 +155,21 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	break;
 	                	
 	                }
+	                else if(result.toLowerCase().contains("play music"))
+	                {
+	                	Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");
+	                	startActivity(intent);
+	                	break;
+	                }
+	                else if(result.toLowerCase().contains("weather"))
+	                {
+	                	String uri = String.format(Locale.ENGLISH, "http://www.google.com/#q=weather");
+	                	
+	                	Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+	                	startActivityForResult(intent, 3);
+	                	break;
+	                	
+	                }
 	                else if(result.toLowerCase().contains("open"))
 	                {
 	                	

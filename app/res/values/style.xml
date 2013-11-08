@@ -2,7 +2,9 @@
 <resources>
     
 <!--     <style name="Theme.Gast" parent="@android:Theme"></style> -->
-     <style name="Theme.Gast" parent="@android:style/Theme.Holo.Light"></style>
+     <style name="Theme.Gast" parent="@android:style/Theme.Holo.Light">
+         <item name="android:soundEffectsEnabled">false</item>
+     </style>
     
 	<style name="apptext">
 		<item name="android:textSize">12sp</item>

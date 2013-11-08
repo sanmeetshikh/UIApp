@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import root.gast.playground.R;
-import root.gast.playground.speech.activation.SpeechActivatorTagWriter;
 import root.gast.speech.activation.SpeechActivationService;
 import android.app.Activity;
 import android.content.Intent;

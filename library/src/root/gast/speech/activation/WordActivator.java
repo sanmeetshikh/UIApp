@@ -40,8 +40,9 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     private static final String TAG = "WordActivator";
 
     private Context context;
-    private SpeechRecognizer recognizer;
+    private static SpeechRecognizer recognizer;
     private SoundsLikeWordMatcher matcher;
+    static boolean allResult = false;
 
     private SpeechActivationListener resultListener;
 
@@ -61,6 +62,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
 
     private void recognizeSpeechDirectly()
     {
+    	Log.d(TAG, "Recognize speech directly");
         Intent recognizerIntent =
                 new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -85,14 +87,15 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     public void onResults(Bundle results)
     {
         Log.d(TAG, "full results");
+        allResult=true;
         receiveResults(results);
     }
 
     @Override
     public void onPartialResults(Bundle partialResults)
     {
-        Log.d(TAG, "partial results");
-        receiveResults(partialResults);
+       Log.d(TAG, "partial results");
+       receiveResults(partialResults);
     }
 
     /**
@@ -121,9 +124,11 @@ public class WordActivator implements SpeechActivator, RecognitionListener
         // find the target word
         for (String possible : heard)
         {
+        	Log.d(TAG, possible);
             WordList wordList = new WordList(possible);
             if (matcher.isIn(wordList.getWords()))
             {
+            	
                 Log.d(TAG, "HEARD IT!");
                 heardTargetWord = true;
                 break;
@@ -137,6 +142,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
         }
         else
         {
+        	Log.d(TAG, "Keep Going");
             // keep going
             recognizeSpeechDirectly();
         }
@@ -184,6 +190,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     @Override
     public void onEndOfSpeech()
     {
+    	Log.d(TAG, "on end of speech");
     }
 
     /**
@@ -192,6 +199,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     @Override
     public void onBeginningOfSpeech()
     {
+    	Log.d(TAG, "on beg of speech");
     }
 
     @Override
@@ -202,6 +210,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     @Override
     public void onRmsChanged(float rmsdB)
     {
+    	//Log.d(TAG, "on rms change");
     }
 
     @Override
