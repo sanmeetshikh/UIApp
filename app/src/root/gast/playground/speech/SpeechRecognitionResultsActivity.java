@@ -18,6 +18,7 @@ package root.gast.playground.speech;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -110,6 +111,29 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	try{
 	                	Intent cameraIntent = getPackageManager().getLaunchIntentForPackage("com.saycheese");
 	                	startActivityForResult(cameraIntent, 0);
+	                	}
+	                	catch(Exception e)
+	                	{
+	                		//catch exception
+	                	}
+	                	break;
+	                }
+	                else if(result.toLowerCase().contains("time"))
+	                {
+	                	//finish();
+	                	try{
+	                		
+	                		Calendar timeNow = Calendar.getInstance();
+	                		int hour =timeNow.get(Calendar.HOUR);
+	                		int minutes =timeNow.get(Calendar.MINUTE);
+	                		int ampm = timeNow.get(Calendar.AM_PM);
+	                		Intent i = new Intent(this, TakeUserResponse.class);
+		                	i.putExtra("HOUR", Integer.toString(hour));
+		                	i.putExtra("MIN", Integer.toString(minutes));
+		                	i.putExtra("AMPM", Integer.toString(ampm));
+		                	i.putExtra("ActivationType", "TIME");
+		                	this.startActivityForResult(i, NO_PACKAGE_FOUND);
+	                		
 	                	}
 	                	catch(Exception e)
 	                	{

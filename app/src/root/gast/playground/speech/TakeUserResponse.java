@@ -15,6 +15,7 @@
  */
 package root.gast.playground.speech;
 
+import java.util.Calendar;
 import java.util.List;
 
 import root.gast.playground.R;
@@ -71,6 +72,17 @@ public class TakeUserResponse extends
         {
         	String songName = intent.getStringExtra("SONG_NAME");
 	        prompt("Could not find the song "+songName);
+        }
+        if(intent.getStringExtra("ActivationType").equals("TIME"))
+        {
+        	String hour = intent.getStringExtra("HOUR");
+        	String min = intent.getStringExtra("MIN");
+        	String ampm = intent.getStringExtra("AMPM");
+        	if(Integer.parseInt(ampm)==Calendar.AM)	
+        		prompt("The time now is "+hour+" "+min+" "+"AM");
+        	if(Integer.parseInt(ampm)==Calendar.PM)	
+        		prompt("The time now is "+hour+" "+min+" "+"PM");
+        	
         }
     }
 
