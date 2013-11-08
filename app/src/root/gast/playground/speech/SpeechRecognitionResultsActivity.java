@@ -61,7 +61,9 @@ public class SpeechRecognitionResultsActivity extends Activity
     public static int CALL_REQUEST =1;
     public static int NOTHING_REQUEST = 2;
     public static int NO_PACKAGE_FOUND = 5;
+    public static int MESSAGE_REQUEST = 6;
     public static String number="";
+    public static String message = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -177,6 +179,46 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	i.putExtra("NUMBER", number);
 	                	i.putExtra("ActivationType", "CALL");
 	                	this.startActivityForResult(i, CALL_REQUEST);
+	                	break;
+	                	
+	                }
+	                else if(result.toLowerCase().contains("text"))
+	                {
+	                	result = result.toLowerCase();
+	                	String[] resultArray=result.split(" ");
+	                	ArrayList<String> resultArrayList = new ArrayList<String>(Arrays.asList(resultArray));
+	                	int posOfText = resultArrayList.indexOf("text");
+	                	int posOfMessage = resultArrayList.indexOf("message");
+	                	List<String> nameList = resultArrayList.subList(posOfText+1, posOfMessage);
+	                	List<String> messageList = resultArrayList.subList(posOfMessage+1, resultArrayList.size());
+	                	String name="";
+	                	String message = "";
+	                	for (String s : nameList)
+	                	{
+	                		name += s + " ";
+	                	}
+	                	for (String s : messageList)
+	                	{
+	                		message += s + " ";
+	                	}
+	                	if(name.equals("") || message.equals("")) 
+	                	{
+	                		Intent i = new Intent(this, TakeUserResponse.class);
+		                	i.putExtra("ActivationType", "MESSAGE_ERROR");
+		                	this.startActivityForResult(i, CALL_REQUEST);
+	                		break;
+	                	}
+	                	
+	                	String number = getPhoneNumber(name, this);
+	                	this.number = number;
+	                	this.message = message;
+	                	Log.d(TAG, "Name: "+name+" Number: "+number+" Message: "+message);
+	                	Intent i = new Intent(this, TakeUserResponse.class);
+	                	i.putExtra("NAME", name);
+	                	i.putExtra("NUMBER", number);
+	                	i.putExtra("MESSAGE", message);
+	                	i.putExtra("ActivationType", "MESSAGE");
+	                	this.startActivityForResult(i, MESSAGE_REQUEST);
 	                	break;
 	                	
 	                }
@@ -397,6 +439,29 @@ public class SpeechRecognitionResultsActivity extends Activity
             					Intent callIntent = new Intent(Intent.ACTION_CALL);
             					callIntent.setData(Uri.parse(uri));
             					startActivity(callIntent);
+            				}
+            			}
+            		}
+                }
+            }
+        }
+
+        if (requestCode == MESSAGE_REQUEST)
+        {
+            if (resultCode == RESULT_OK)
+            {
+            	if (data != null)
+                {
+            		if(data.hasExtra("USER_RESPONSE"))
+            		{
+            			if(data.getStringExtra("USER_RESPONSE").equals("yes"))
+            			{
+            				if(!number.equals("")&&!number.equals("Unsaved"))
+            				{
+            					Uri uri = Uri.parse("smsto:"+number);   
+            					Intent it = new Intent(Intent.ACTION_SENDTO, uri);   
+            					it.putExtra("sms_body", message);   
+            					startActivity(it);
             				}
             			}
             		}

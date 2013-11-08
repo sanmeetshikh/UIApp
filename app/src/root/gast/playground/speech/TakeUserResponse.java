@@ -59,6 +59,17 @@ public class TakeUserResponse extends
 	        String number = intent.getStringExtra("NUMBER");
 	        prompt("Would you like to call "+name+" on "+number);
         }
+        
+        if(intent.getStringExtra("ActivationType").equals("MESSAGE"))
+        {
+        	String name = intent.getStringExtra("NAME");
+        	String message = intent.getStringExtra("MESSAGE");
+        	prompt("Would you like to send text to "+name+" "+message);
+        }
+        if(intent.getStringExtra("ActivationType").equals("MESSAGE_ERROR"))
+        {
+        	prompt("To send a text, say Text John message How are you?");
+        }
         if(intent.getStringExtra("ActivationType").equals("NOTHING"))
         {
 	        prompt("I am sorry this is not a valid command");
@@ -103,7 +114,7 @@ public class TakeUserResponse extends
     public void onDone(String utteranceId)
     {
     	Intent intent = getIntent();
-        if(intent.getStringExtra("ActivationType").equals("CALL"))
+        if(intent.getStringExtra("ActivationType").equals("CALL") || intent.getStringExtra("ActivationType").equals("MESSAGE") )
         {
 	        if (utteranceId.equals(ON_DONE_PROMPT_TTS_PARAM))
 	        {
@@ -112,7 +123,7 @@ public class TakeUserResponse extends
 	            recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
 	                    RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
 	            recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, 
-	                    getString(R.string.speech_launcher_prompt));
+	                    "YES or NO?");
 	            recognize(recognizerIntent);
 	        }
         }

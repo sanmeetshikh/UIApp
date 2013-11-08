@@ -208,6 +208,7 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     @Override
     public void onBufferReceived(byte[] buffer)
     {
+    	Log.d(TAG, "on buffer received");
     }
 
     @Override
@@ -219,5 +220,6 @@ public class WordActivator implements SpeechActivator, RecognitionListener
     @Override
     public void onEvent(int eventType, Bundle params)
     {
+    	Log.d(TAG, "on event");
     }
 }
