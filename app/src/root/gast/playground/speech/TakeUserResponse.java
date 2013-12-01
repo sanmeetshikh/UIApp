@@ -55,11 +55,18 @@ public class TakeUserResponse extends
         Intent intent = getIntent();
         if(intent.getStringExtra("ActivationType").equals("CALL"))
         {
+        	
 	        String name = intent.getStringExtra("NAME");
 	        String number = intent.getStringExtra("NUMBER");
 	        prompt("Would you like to call "+name+" on "+number);
         }
-        
+        if(intent.getStringExtra("ActivationType").equals("NUMBER_ERROR"))
+        {
+        	
+	        String name = intent.getStringExtra("NAME");
+	        prompt("Could not find the contact "+name);
+	        
+        }
         if(intent.getStringExtra("ActivationType").equals("MESSAGE"))
         {
         	String name = intent.getStringExtra("NAME");
@@ -69,6 +76,11 @@ public class TakeUserResponse extends
         if(intent.getStringExtra("ActivationType").equals("MESSAGE_ERROR"))
         {
         	prompt("To send a text, say Text John message How are you?");
+        }
+        if(intent.getStringExtra("ActivationType").equals("MSG_SENT"))
+        {
+        	String name = intent.getStringExtra("NAME");
+        	prompt("Okay! Text sent to "+name);
         }
         if(intent.getStringExtra("ActivationType").equals("NOTHING"))
         {

@@ -23,9 +23,11 @@ import root.gast.speech.activation.SpeechActivationService;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
 
 /**
  * test different ways to activate speech recognition as a service
@@ -35,7 +37,7 @@ public class SpeechActivationServicePlay extends Activity
 {
     private static final String TAG = "SpeechActivationServicePlay";
     static String activationType;
-    
+    boolean isServiceStarted = false;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -60,6 +62,7 @@ public class SpeechActivationServicePlay extends Activity
             public void onClick(View v)
             {
                 Log.d(TAG, "stop service");
+                isServiceStarted = false;
                 Intent i = SpeechActivationService.makeServiceStopIntent(SpeechActivationServicePlay.this);
                 SpeechActivationServicePlay.this.startService(i);
             }
@@ -80,6 +83,7 @@ public class SpeechActivationServicePlay extends Activity
             @Override
             public void onClick(View v)
             {
+            	isServiceStarted=true;
                 String activationTypeName = SpeechActivationServicePlay.this.getString(name);
                 activationType = activationTypeName;
                 Intent i = SpeechActivationService.makeStartServiceIntent(SpeechActivationServicePlay.this,
@@ -91,4 +95,39 @@ public class SpeechActivationServicePlay extends Activity
         
         return start;
     }
+    
+   /* CountDownTimer countDownTimer = new CountDownTimer(10*1000, 1000) {
+
+    	@Override
+        public void onFinish() {
+    		
+    		if(isServiceStarted){
+	    		//stop service
+	    		Intent i = SpeechActivationService.makeServiceStopIntent(SpeechActivationServicePlay.this);
+	            SpeechActivationServicePlay.this.startService(i);
+	            isServiceStarted=false;
+	            //start service
+	           
+	            Intent in = SpeechActivationService.makeStartServiceIntent(SpeechActivationServicePlay.this,
+	                    activationType);
+	            SpeechActivationServicePlay.this.startService(in);
+	            isServiceStarted=true;
+    		}
+	            countDownTimer.start();
+    		
+            
+        }
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+			// TODO Auto-generated method stub
+			
+		}
+     }.start();
+     
+     @Override
+     protected void onDestroy(){
+    	 
+    	 countDownTimer.cancel();
+     }*/
 }

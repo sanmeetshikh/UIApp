@@ -39,6 +39,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
+import android.telephony.SmsManager;
 import android.util.Log;
 import root.gast.playground.speech.SpeechRecognitionLauncher;
 
@@ -64,6 +65,7 @@ public class SpeechRecognitionResultsActivity extends Activity
     public static int MESSAGE_REQUEST = 6;
     public static String number="";
     public static String message = "";
+    public static String name = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -171,12 +173,19 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                	{
 	                		name += s + " ";
 	                	}
-	                	String number = getPhoneNumber(name, this);
-	                	this.number = number;
-	                	Log.d(TAG, "Name: "+name+" Number: "+number);
+	                	List<String> number = getPhoneNumber(name, this);
+	                	if(number.get(0).equals("Unsaved")){
+	                		Intent i = new Intent(this, TakeUserResponse.class);
+		                	i.putExtra("NAME", name);
+		                	i.putExtra("ActivationType", "NUMBER_ERROR");
+		                	this.startActivityForResult(i, CALL_REQUEST);
+		                	break;
+	                	}
+	                	this.number = number.get(0);
+	                	Log.d(TAG, "Name: "+number.get(1)+" Number: "+number.get(0));
 	                	Intent i = new Intent(this, TakeUserResponse.class);
-	                	i.putExtra("NAME", name);
-	                	i.putExtra("NUMBER", number);
+	                	i.putExtra("NAME", number.get(1));
+	                	i.putExtra("NUMBER", number.get(0));
 	                	i.putExtra("ActivationType", "CALL");
 	                	this.startActivityForResult(i, CALL_REQUEST);
 	                	break;
@@ -209,13 +218,21 @@ public class SpeechRecognitionResultsActivity extends Activity
 	                		break;
 	                	}
 	                	
-	                	String number = getPhoneNumber(name, this);
-	                	this.number = number;
+	                	List<String> number = getPhoneNumber(name, this);
+	                	if(number.get(0).equals("Unsaved")){
+	                		Intent i = new Intent(this, TakeUserResponse.class);
+		                	i.putExtra("NAME", name);
+		                	i.putExtra("ActivationType", "NUMBER_ERROR");
+		                	this.startActivityForResult(i, CALL_REQUEST);
+		                	break;
+	                	}
+	                	this.number = number.get(0);
 	                	this.message = message;
-	                	Log.d(TAG, "Name: "+name+" Number: "+number+" Message: "+message);
+	                	this.name = number.get(1);
+	                	Log.d(TAG, "Name: "+number.get(1)+" Number: "+number.get(0)+" Message: "+message);
 	                	Intent i = new Intent(this, TakeUserResponse.class);
-	                	i.putExtra("NAME", name);
-	                	i.putExtra("NUMBER", number);
+	                	i.putExtra("NAME", number.get(1));
+	                	i.putExtra("NUMBER", number.get(0));
 	                	i.putExtra("MESSAGE", message);
 	                	i.putExtra("ActivationType", "MESSAGE");
 	                	this.startActivityForResult(i, MESSAGE_REQUEST);
@@ -346,19 +363,23 @@ public class SpeechRecognitionResultsActivity extends Activity
         }
     }
     
-    public String getPhoneNumber(String name, Context context) {
-    	String ret = null;
+    public List<String> getPhoneNumber(String name, Context context) {
+    	ArrayList<String> ret = new ArrayList<String>();
     	name = name.trim();
     	String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME+" like'%" + name +"%'";
-    	String[] projection = new String[] { ContactsContract.CommonDataKinds.Phone.NUMBER};
+    	String[] projection = new String[] { ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
     	Cursor c = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
     	        projection, selection, null, null);
     	if (c.moveToFirst()) {
-    	    ret = c.getString(0);
+    	    ret.add(c.getString(0));
+    	    ret.add(c.getString(1));
     	}
     	c.close();
-    	if(ret==null)
-    	    ret = "Unsaved";
+    	if(ret.size()==0)
+    	{
+    	    ret.add("Unsaved");
+    		ret.add(name);
+    	}
     	return ret;
     	}
     
@@ -458,10 +479,17 @@ public class SpeechRecognitionResultsActivity extends Activity
             			{
             				if(!number.equals("")&&!number.equals("Unsaved"))
             				{
-            					Uri uri = Uri.parse("smsto:"+number);   
+            					/*Uri uri = Uri.parse("smsto:"+number);   
             					Intent it = new Intent(Intent.ACTION_SENDTO, uri);   
             					it.putExtra("sms_body", message);   
-            					startActivity(it);
+            					startActivity(it);*/
+            					SmsManager sms = SmsManager.getDefault();
+            				    sms.sendTextMessage(number, null, message, null, null);
+            				    Intent i = new Intent(this, TakeUserResponse.class);
+    		                	i.putExtra("ActivationType", "MSG_SENT");
+    		                	i.putExtra("NAME", name);
+    		                	this.startActivityForResult(i, NO_PACKAGE_FOUND);
+            				    
             				}
             			}
             		}
